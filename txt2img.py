@@ -101,7 +101,7 @@ def main():
         "--prompt",
         type=str,
         nargs="?",
-        default="a painting of a virus monster playing guitar",
+        default="a cat on a plane",
         help="the prompt to render"
     )
     parser.add_argument(
@@ -279,7 +279,7 @@ def main():
 
     precision_scope = autocast if opt.precision=="autocast" else nullcontext
     with torch.no_grad():
-        with precision_scope("cuda"):
+        with autocast():
             with model.ema_scope():
                 tic = time.time()
                 all_samples = list()
@@ -300,9 +300,9 @@ def main():
                                                          unconditional_guidance_scale=opt.scale,
                                                          unconditional_conditioning=uc,
                                                          eta=opt.ddim_eta,
-                                                         x_T=start_code)
+                                                         x_T=start_code)#samples_ddim.shape=torch.Size([1, 4, 64, 64])
 
-                        x_samples_ddim = model.decode_first_stage(samples_ddim)
+                        x_samples_ddim = model.decode_first_stage(samples_ddim) #x_samples_ddim.shape=torch.Size([1, 3, 512, 512])
                         x_samples_ddim = torch.clamp((x_samples_ddim + 1.0) / 2.0, min=0.0, max=1.0)
                         x_samples_ddim = x_samples_ddim.cpu().permute(0, 2, 3, 1).numpy()
 

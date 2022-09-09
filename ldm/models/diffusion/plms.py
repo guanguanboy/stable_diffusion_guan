@@ -121,7 +121,7 @@ class PLMSSampler(object):
         device = self.model.betas.device
         b = shape[0]
         if x_T is None:
-            img = torch.randn(shape, device=device)
+            img = torch.randn(shape, device=device) #这里的size是latent space 的size torch.Size([1, 4, 64, 64])
         else:
             img = x_T
 
@@ -182,8 +182,8 @@ class PLMSSampler(object):
                 x_in = torch.cat([x] * 2)
                 t_in = torch.cat([t] * 2)
                 c_in = torch.cat([unconditional_conditioning, c])
-                e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
-                e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond)
+                e_t_uncond, e_t = self.model.apply_model(x_in, t_in, c_in).chunk(2) #这里执行一次U-Net的前向过程,有条件和无条件的输出都是torch.Size([1, 4, 64, 64])
+                e_t = e_t_uncond + unconditional_guidance_scale * (e_t - e_t_uncond) #classifier-free guidance
 
             if score_corrector is not None:
                 assert self.model.parameterization == "eps"
@@ -218,9 +218,9 @@ class PLMSSampler(object):
         e_t = get_model_output(x, t)
         if len(old_eps) == 0:
             # Pseudo Improved Euler (2nd order)
-            x_prev, pred_x0 = get_x_prev_and_pred_x0(e_t, index)
-            e_t_next = get_model_output(x_prev, t_next)
-            e_t_prime = (e_t + e_t_next) / 2
+            x_prev, pred_x0 = get_x_prev_and_pred_x0(e_t, index) #输出shape都是torch.Size([1, 4, 64, 64])
+            e_t_next = get_model_output(x_prev, t_next) #torch.Size([1, 4, 64, 64])
+            e_t_prime = (e_t + e_t_next) / 2 #torch.Size([1, 4, 64, 64])
         elif len(old_eps) == 1:
             # 2nd order Pseudo Linear Multistep (Adams-Bashforth)
             e_t_prime = (3 * e_t - old_eps[-1]) / 2
@@ -231,6 +231,6 @@ class PLMSSampler(object):
             # 4nd order Pseudo Linear Multistep (Adams-Bashforth)
             e_t_prime = (55 * e_t - 59 * old_eps[-1] + 37 * old_eps[-2] - 9 * old_eps[-3]) / 24
 
-        x_prev, pred_x0 = get_x_prev_and_pred_x0(e_t_prime, index)
+        x_prev, pred_x0 = get_x_prev_and_pred_x0(e_t_prime, index)#torch.Size([1, 4, 64, 64]),torch.Size([1, 4, 64, 64])
 
         return x_prev, pred_x0, e_t
