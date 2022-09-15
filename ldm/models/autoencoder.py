@@ -38,7 +38,7 @@ class VQModel(pl.LightningModule):
         self.loss = instantiate_from_config(lossconfig)
         self.quantize = VectorQuantizer(n_embed, embed_dim, beta=0.25,
                                         remap=remap,
-                                        sane_index_shape=sane_index_shape)
+                                        sane_index_shape=sane_index_shape) #VectorQuantizer实现的就是codebook
         self.quant_conv = torch.nn.Conv2d(ddconfig["z_channels"], embed_dim, 1)
         self.post_quant_conv = torch.nn.Conv2d(embed_dim, ddconfig["z_channels"], 1)
         if colorize_nlabels is not None:
@@ -297,7 +297,7 @@ class AutoencoderKL(pl.LightningModule):
         self.image_key = image_key
         self.encoder = Encoder(**ddconfig)
         self.decoder = Decoder(**ddconfig)
-        self.loss = instantiate_from_config(lossconfig)
+        self.loss = instantiate_from_config(lossconfig) #perceptual loss + advesiral loss
         assert ddconfig["double_z"]
         self.quant_conv = torch.nn.Conv2d(2*ddconfig["z_channels"], 2*embed_dim, 1)
         self.post_quant_conv = torch.nn.Conv2d(embed_dim, ddconfig["z_channels"], 1)

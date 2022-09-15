@@ -1011,7 +1011,7 @@ class LatentDiffusion(DDPM):
 
     def p_losses(self, x_start, cond, t, noise=None):
         noise = default(noise, lambda: torch.randn_like(x_start))
-        x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
+        x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise) #在真实图片上添加噪声
         model_output = self.apply_model(x_noisy, t, cond)
 
         loss_dict = {}
@@ -1403,7 +1403,7 @@ class DiffusionWrapper(pl.LightningModule):
         if self.conditioning_key is None:
             out = self.diffusion_model(x, t)
         elif self.conditioning_key == 'concat':
-            xc = torch.cat([x] + c_concat, dim=1)
+            xc = torch.cat([x] + c_concat, dim=1) #将条件和x噪声concat起来
             out = self.diffusion_model(xc, t)
         elif self.conditioning_key == 'crossattn':
             cc = torch.cat(c_crossattn, 1)
