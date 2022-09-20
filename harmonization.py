@@ -76,7 +76,7 @@ if __name__ == "__main__":
     model.load_state_dict(torch.load("models/ldm/harmonization/last.ckpt")["state_dict"],
                           strict=False)
 
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu")
     model = model.to(device)
     
     #实例化采样器
@@ -99,8 +99,8 @@ if __name__ == "__main__":
 
                 # encode masked image and concat downsampled mask
                 c = model.cond_stage_model.encode(batch["cond_image"]) #使用image的背景，前景全0作为encoder的输入
-                #cc = torch.nn.functional.interpolate(batch["mask"],
-                #                                     size=c.shape[-2:]) #将mask进行缩放
+                cc = torch.nn.functional.interpolate(batch["mask"],
+                                                     size=c.shape[-2:]) #将mask进行缩放
                 #c = torch.cat((c, cc), dim=1) #将mask和masked_image concate起来作为conditioning
 
                 shape = (c.shape[1],)+c.shape[2:]
@@ -108,6 +108,7 @@ if __name__ == "__main__":
                                                  conditioning=c,
                                                  batch_size=c.shape[0],
                                                  shape=shape,
+                                                 mask=cc,
                                                  verbose=False)
                 x_samples_ddim = model.decode_first_stage(samples_ddim)#对扩散结果进行解码
 

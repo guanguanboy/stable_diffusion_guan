@@ -90,11 +90,11 @@ class HarmonizationBase(data.Dataset):
 
 class HarmonizationTrain(HarmonizationBase):
     def __init__(self, **kwargs):
-        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_train/", sub_dir='composite_images_train', **kwargs)
+        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_train_without_noise/", sub_dir='composite_images_train_without_noise', **kwargs)
 
 class HarmonizationValidation(HarmonizationBase):
     def __init__(self, **kwargs):
-        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_test/", sub_dir='composite_images_test', **kwargs)
+        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_test_without_noise/", sub_dir='composite_images_test_without_noise', **kwargs)
 
 
 class SSHarmonizationTestDataset(data.Dataset):
