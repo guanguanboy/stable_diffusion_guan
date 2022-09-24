@@ -90,12 +90,22 @@ class HarmonizationBase(data.Dataset):
 
 class HarmonizationTrain(HarmonizationBase):
     def __init__(self, **kwargs):
-        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_train_without_noise/", sub_dir='composite_images_train_without_noise', **kwargs)
+        #super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_train_without_noise/", sub_dir='composite_images_train_without_noise', **kwargs)
+        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/HAdobe5k/composite_images_train/", sub_dir='composite_images_train', **kwargs)
 
 class HarmonizationValidation(HarmonizationBase):
     def __init__(self, **kwargs):
-        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_test_without_noise/", sub_dir='composite_images_test_without_noise', **kwargs)
+        #super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_test_without_noise/", sub_dir='composite_images_test_without_noise', **kwargs)
+        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_test/", sub_dir='composite_images_test', **kwargs)
 
+
+class HarmonizationDay2nightTrain(HarmonizationBase):
+    def __init__(self, **kwargs):
+        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_train_without_noise/", sub_dir='composite_images_train_without_noise', **kwargs)
+
+class HarmonizationDay2nightValidation(HarmonizationBase):
+    def __init__(self, **kwargs):
+        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_test_without_noise/", sub_dir='composite_images_test_without_noise', **kwargs)
 
 class SSHarmonizationTestDataset(data.Dataset):
     def __init__(self, data_root, mask_config={}, data_len=-1, image_size=[256, 256], loader=pil_loader):

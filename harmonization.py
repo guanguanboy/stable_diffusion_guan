@@ -101,14 +101,16 @@ if __name__ == "__main__":
                 c = model.cond_stage_model.encode(batch["cond_image"]) #使用image的背景，前景全0作为encoder的输入
                 cc = torch.nn.functional.interpolate(batch["mask"],
                                                      size=c.shape[-2:]) #将mask进行缩放
-                #c = torch.cat((c, cc), dim=1) #将mask和masked_image concate起来作为conditioning
 
                 shape = (c.shape[1],)+c.shape[2:]
+
+                c = torch.cat((c, cc), dim=1) #将mask和masked_image concate起来作为conditioning
+
                 samples_ddim, _ = sampler.sample(S=opt.steps,
                                                  conditioning=c,
                                                  batch_size=c.shape[0],
                                                  shape=shape,
-                                                 mask=cc,
+                                                 mask=None,
                                                  verbose=False)
                 x_samples_ddim = model.decode_first_stage(samples_ddim)#对扩散结果进行解码
 

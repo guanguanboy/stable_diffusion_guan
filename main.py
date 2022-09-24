@@ -608,7 +608,8 @@ if __name__ == "__main__":
                 "params": {
                     "batch_frequency": 750,
                     "max_images": 4,
-                    "clamp": True
+                    "clamp": True,
+                    "log_first_step": True
                 }
             },
             "learning_rate_logger": {

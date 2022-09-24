@@ -878,7 +878,9 @@ class LatentDiffusion(DDPM):
             if self.shorten_cond_schedule:  # TODO: drop this option
                 tc = self.cond_ids[t].to(self.device)
                 c = self.q_sample(x_start=c, t=tc, noise=torch.randn_like(c.float()))
-        return self.p_losses(x, c, t, mask, *args, **kwargs)
+        
+        cond_list = [c, mask]
+        return self.p_losses(x, cond_list, t, mask, *args, **kwargs)#self.p_losses(x, c, t, mask, *args, **kwargs)
 
     def _rescale_annotations(self, bboxes, crop_coordinates):  # TODO: move to dataset
         def rescale_bbox(bbox):
@@ -1015,7 +1017,10 @@ class LatentDiffusion(DDPM):
         noise = default(noise, lambda: torch.randn_like(x_start))
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
 
-        x_noisy_for_model = x_noisy*mask + (1-mask)*x_start
+        #x_noisy_for_model = x_noisy*mask + (1-mask)*x_start
+        #model_output = self.apply_model(x_noisy_for_model, t, cond)
+
+        x_noisy_for_model = x_noisy
         model_output = self.apply_model(x_noisy_for_model, t, cond)
 
         loss_dict = {}
@@ -1028,7 +1033,8 @@ class LatentDiffusion(DDPM):
         else:
             raise NotImplementedError()
 
-        loss_simple = self.get_loss(model_output*mask, target*mask, mean=False).mean([1, 2, 3])
+        #loss_simple = self.get_loss(model_output*mask, target*mask, mean=False).mean([1, 2, 3])
+        loss_simple = self.get_loss(model_output, target, mean=False).mean([1, 2, 3])
         loss_dict.update({f'{prefix}/loss_simple': loss_simple.mean()})
 
         logvar_t = self.logvar[t].to(self.device)
@@ -1283,6 +1289,9 @@ class LatentDiffusion(DDPM):
             if ismap(xc):
                 log["original_conditioning"] = self.to_rgb(xc)
 
+        mask = batch["mask"]
+        mask = torch.nn.functional.interpolate(mask, size=c.shape[-2:])
+        c = torch.cat([c, mask], dim=1)
         if plot_diffusion_rows:
             # get diffusion row
             diffusion_row = list()
