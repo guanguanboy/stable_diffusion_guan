@@ -1,3 +1,4 @@
+from distutils import text_file
 import torch.utils.data as data
 from torchvision import transforms
 from PIL import Image
@@ -31,13 +32,24 @@ def make_dataset(dir):
 def pil_loader(path):
     return Image.open(path).convert('RGB')
 
+def make_dataset_with_file(root_dir, sub_dir, txt_file):
+    
+    file_path = os.path.join(root_dir, txt_file)
+    image_paths = []
+    if os.path.isfile(file_path):
+        with open(file_path, "r") as f:
+            image_paths = f.read().splitlines()
+    #composite_dir = os.path.join(root_dir, sub_dir)
+    complete_image_paths = [os.path.join(root_dir, sub_dir, l) for l in image_paths]
+    #print('file counts = ', len(complete_image_paths))
+    return complete_image_paths
 
 import torchvision.transforms.functional as tf
 
 class HarmonizationBase(data.Dataset):
-    def __init__(self, data_root, sub_dir, size=256):
-        imgs = make_dataset(data_root)
-
+    def __init__(self, data_root, sub_dir, text_file, size=256):
+        #imgs = make_dataset(data_root)
+        imgs = make_dataset_with_file(data_root, sub_dir, text_file)
         self.imgs = imgs
         self.tfs = transforms.Compose([
                 transforms.Resize((size, size)),
@@ -90,11 +102,11 @@ class HarmonizationBase(data.Dataset):
 
 class HarmonizationTrain(HarmonizationBase):
     def __init__(self, **kwargs):
-        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_train_without_noise/", sub_dir='composite_images_train_without_noise', **kwargs)
+        super().__init__(data_root="/mnt/lustre/zhaobin/liguanlin/datasets/HAdobe5k/", sub_dir='composite_images', text_file='HAdobe5k_train.txt', **kwargs)
 
 class HarmonizationValidation(HarmonizationBase):
     def __init__(self, **kwargs):
-        super().__init__(data_root="/data1/liguanlin/Datasets/iHarmony/Hday2night/composite_images_test_without_noise/", sub_dir='composite_images_test_without_noise', **kwargs)
+        super().__init__(data_root="/mnt/lustre/zhaobin/liguanlin/datasets/HAdobe5k/", sub_dir='composite_images', text_file='HAdobe5k_test.txt', **kwargs)
 
 
 class SSHarmonizationTestDataset(data.Dataset):
